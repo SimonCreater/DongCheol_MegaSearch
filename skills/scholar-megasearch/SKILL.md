@@ -34,6 +34,9 @@ Core engines expected when fully installed:
 - MCP servers: `arxiv-mcp-server`, `asta`, and `paper-search-mcp`.
 - Local fallbacks: `scripts/search_local.py {arxiv|semanticscholar|ddg}` and
   `scripts/resilient_search.py`, plus `scripts/fetch_pdfs.py`.
+- Artifact viewer: `scripts/render_artifact.py <run-dir>` writes a self-contained
+  `artifact/index.html`; `--serve` previews it on `127.0.0.1` without replacing the
+  Markdown/JSON outputs.
 
 Source buckets A-G:
 
@@ -139,6 +142,26 @@ download_with_fallback`, source-specific `download_*`, or `download_scihub`) —
 standalone script cannot reach MCP. To read extracted full text afterward, use the
 `read_*_paper` MCP tools or `pdfplumber`/`pymupdf` from the installed host venv.
 See `references/sources.md` for the full acquisition tool list.
+
+### 8. Render the HTML artifact viewer
+Create a portable, self-contained report after `corpus.json`, `summary.md`, and optional
+`pdfs/manifest.json` exist:
+```bash
+python3 <skill-dir>/scripts/render_artifact.py \
+  ./literature_search/<slug>_<date>
+```
+This writes `./literature_search/<slug>_<date>/artifact/index.html` with run stats,
+summary text, source/provenance chips, rank layers, PDF status, links, and client-side
+search/filter/sort controls. It does not replace `corpus.md` or `summary.md`.
+
+For a quick local preview, opt in explicitly:
+```bash
+python3 <skill-dir>/scripts/render_artifact.py \
+  ./literature_search/<slug>_<date> --serve --open
+```
+The preview server binds to `127.0.0.1` by default and serves only the run directory
+so sibling PDF links can resolve. Use `--port` or `--bind` only when you intentionally
+need a different preview target.
 
 ## Depth levels (L1–L5)
 One knob: breadth (facets × buckets × hits) and recursion (extra waves) scale together.

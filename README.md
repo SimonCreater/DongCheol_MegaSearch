@@ -197,6 +197,14 @@ python3 ~/.claude/skills/scholar-megasearch/scripts/resilient_search.py \
 python3 ~/.claude/skills/scholar-megasearch/scripts/fetch_pdfs.py \
   corpus.json -o ./pdfs --email you@example.com --top 25
 
+# render a self-contained HTML report for a completed run
+python3 ~/.claude/skills/scholar-megasearch/scripts/render_artifact.py \
+  ./literature_search/<topic>_<date>
+
+# preview the HTML report at http://127.0.0.1:8765/
+python3 ~/.claude/skills/scholar-megasearch/scripts/render_artifact.py \
+  ./literature_search/<topic>_<date> --serve --open
+
 # Codex default script path is:
 # ~/.agents/skills/scholar-megasearch/scripts/
 ```
@@ -243,6 +251,7 @@ literature_search/<topic>_<date>/
 ├── corpus.json           # deduplicated, ranked, provenance-tracked corpus
 ├── corpus.md             # human-readable digest
 ├── pdfs/                  # acquired original PDFs + manifest.json
+├── artifact/index.html     # optional self-contained HTML viewer
 └── summary.md            # synthesized review
 ```
 
@@ -293,7 +302,7 @@ scholar-megasearch/
     ├── scholar-megasearch/   # the skill
     │   ├── SKILL.md
     │   ├── references/{sources.md, orchestration.md}
-    │   └── scripts/{merge_corpus.py, fetch_pdfs.py, search_local.py}
+    │   └── scripts/{merge_corpus.py, fetch_pdfs.py, render_artifact.py, search_local.py}
     └── arxiv-search/          # supporting venv-search skill
 ```
 
@@ -314,6 +323,10 @@ time, and Semantic Scholar is the remote Ai2 Asta service. See [Attribution](#at
   Crossref and OpenAlex. The installer handles this.
 - **Host-specific scholar gateways are best-effort** — they may be absent in
   headless/cron runs, so they are never a bucket's only source.
+- **HTML artifacts are opt-in.** `render_artifact.py` writes a static
+  `artifact/index.html` report from an existing run directory. It starts no server unless
+  `--serve` is passed; the preview server binds to `127.0.0.1` by default and serves only
+  the run directory so sibling PDF links can resolve.
 - **Honest synthesis.** `summary.md` reports what was actually searched and which
   sources failed; nothing is invented to fill a gap.
 
